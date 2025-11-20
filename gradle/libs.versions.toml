@@ -2,7 +2,7 @@
 kotlin = "1.9.+"
 ktlint = "12.+"
 sonarlint = "1.0.+"
-exposed = "0.44.+"
+exposed = "0.61.+"
 postgres = "42.+"
 selenium3 = "3.+"
 liquibaseCore = "4.+"
