@@ -8,16 +8,21 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.nio.file.Paths
-import kotlin.io.path.notExists
 
 fun main() = runBlocking {
-    Database.connect("jdbc:sqlite:test.db", driver = "org.sqlite.JDBC")
+    val dbHost = System.getenv("DB_HOST") ?: "localhost"
+    val dbPort = (System.getenv("DB_PORT") ?: "5432").toInt()
+    val dbName = System.getenv("POSTGRES_DB") ?: System.getenv("DB_NAME") ?: "rss-builder"
+    val dbUser = System.getenv("POSTGRES_USER") ?: System.getenv("DB_USER") ?: "postgres"
+    val dbPass = System.getenv("POSTGRES_PASSWORD") ?: System.getenv("DB_PASSWORD") ?: "postgres"
 
-    if (Paths.get("test.db").notExists()) {
-        transaction {
-            SchemaUtils.create(CrawlTargets, CrawlResults)
+    val jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
+    Database.connect(jdbcUrl, driver = "org.postgresql.Driver", user = dbUser, password = dbPass)
 
+    transaction {
+        SchemaUtils.createMissingTablesAndColumns(CrawlTargets, CrawlResults)
+
+        if (CrawlTarget.all().empty()) {
             CrawlTarget.new {
                 url = "https://kicker.de"
                 adBannerWaitTimeInMillis = 1000

@@ -1,0 +1,24 @@
+[versions]
+kotlin = "1.9.+"
+ktlint = "12.+"
+sonarlint = "1.0.+"
+exposed = "0.44.+"
+postgres = "42.+"
+selenium3 = "3.+"
+
+[libraries]
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+sonar-kotlin-plugin = { group = "org.sonarsource.kotlin", name = "sonar-kotlin-plugin", version = "2.+" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
+exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
+exposed-crypt = { group = "org.jetbrains.exposed", name = "exposed-crypt", version.ref = "exposed" }
+exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+exposed-kotlin-datetime = { group = "org.jetbrains.exposed", name = "exposed-kotlin-datetime", version.ref = "exposed" }
+selenium-java = { group = "org.seleniumhq.selenium", name = "selenium-java", version.ref = "selenium3" }
+selenium-firefox-driver = { group = "org.seleniumhq.selenium", name = "selenium-firefox-driver", version.ref = "selenium3" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+sonarlint = { id = "se.solrike.sonarlint", version.ref = "sonarlint" }

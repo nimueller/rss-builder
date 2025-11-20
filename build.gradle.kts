@@ -1,8 +1,8 @@
 plugins {
     application
-    kotlin("jvm") version "1.9.+"
-    id("org.jlleitschuh.gradle.ktlint") version "12.+"
-    id("se.solrike.sonarlint") version "1.0.+"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.sonarlint)
 }
 
 group = "dev.cryptospace"
@@ -16,23 +16,21 @@ repositories {
     mavenCentral()
 }
 
-val exposedVersion: String by project
-
 dependencies {
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
 
-    sonarlintPlugins("org.sonarsource.kotlin:sonar-kotlin-plugin:2.+")
+    sonarlintPlugins(libs.sonar.kotlin.plugin)
 
-    implementation("org.xerial:sqlite-jdbc:3.+")
+    implementation(libs.postgresql)
 
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-crypt:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.crypt)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.kotlin.datetime)
 
-    implementation("org.seleniumhq.selenium:selenium-java:3.+")
-    implementation("org.seleniumhq.selenium:selenium-firefox-driver:3.+")
+    implementation(libs.selenium.java)
+    implementation(libs.selenium.firefox.driver)
 }
 
 tasks.test {
