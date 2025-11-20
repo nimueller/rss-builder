@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.+"
+kotlin = "2.2.+"
 ktlint = "12.+"
 sonarlint = "1.0.+"
 exposed = "0.44.+"
