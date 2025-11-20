@@ -1,9 +1,22 @@
 databaseChangeLog:
   - changeSet:
+      id: 000-init-db
+      author: nimueller
+      changes:
+        - sqlFile:
+            path: 000-init-db.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: 000-init-db.rollback.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
       id: 001-create-crawl-targets
       author: nimueller
       changes:
         - createTable:
+            schemaName: rss-builder
             tableName: crawl_targets
             columns:
               - column:
@@ -48,6 +61,7 @@ databaseChangeLog:
       author: nimueller
       changes:
         - createTable:
+            schemaName: rss-builder
             tableName: crawl_results
             columns:
               - column:
@@ -67,13 +81,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
+            baseTableSchemaName: rss-builder
             baseTableName: crawl_results
             baseColumnNames: target_id
+            referencedTableSchemaName: rss-builder
             referencedTableName: crawl_targets
             referencedColumnNames: id
             constraintName: fk_crawl_results_target
             onDelete: CASCADE
         - createIndex:
+            schemaName: rss-builder
             tableName: crawl_results
             indexName: idx_crawl_results_target_id
             columns:

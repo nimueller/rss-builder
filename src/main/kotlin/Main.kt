@@ -4,6 +4,8 @@ import dev.cryptospace.rss.entity.CrawlTarget
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.DatabaseConfig
+import org.jetbrains.exposed.sql.Schema
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun main() {
@@ -17,7 +19,15 @@ fun main() {
         val jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
 
         // Now connect Exposed
-        Database.connect(jdbcUrl, driver = "org.postgresql.Driver", user = dbUser, password = dbPass)
+        Database.connect(
+            url = jdbcUrl,
+            driver = "org.postgresql.Driver",
+            user = dbUser,
+            password = dbPass,
+            databaseConfig = DatabaseConfig {
+                defaultSchema = Schema("rss-builder")
+            },
+        )
 
         // Seed initial data if empty
         transaction {
