@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.9.+"
 ktlint = "12.+"
-sonarlint = "1.0.+"
+sonarlint = "2.2.+"
 exposed = "0.44.+"
 postgres = "42.+"
 selenium3 = "3.+"
