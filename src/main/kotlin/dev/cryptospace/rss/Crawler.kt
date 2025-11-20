@@ -30,7 +30,5 @@ object Crawler {
         adBannerButtonSelector?.let { webDriver.findElement(By.cssSelector(it)).click() }
     }
 
-    fun CrawlTarget.fetchItems(): List<WebElement> {
-        return webDriver.findElements(By.cssSelector(itemSelector))
-    }
+    fun CrawlTarget.fetchItems(): List<WebElement> = webDriver.findElements(By.cssSelector(itemSelector))
 }

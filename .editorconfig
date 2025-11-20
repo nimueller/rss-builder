@@ -1,9 +1,12 @@
-root = true
-
 [*]
-end_of_line = lf
+charset = utf-8
 insert_final_newline = true
+indent_size = 4
+indent_style = space
+max_line_length = 120
+trim_trailing_whitespace = true
 
+# noinspection EditorConfigKeyCorrectness
 [*.{kt,kts}]
-ktlint_code_style = ktlint_official
-ktlint_multiline-expression-wrapping = disabled
+ktlint_code_style = intellij_idea
+ktlint_standard_blank-line-before-declaration = enabled

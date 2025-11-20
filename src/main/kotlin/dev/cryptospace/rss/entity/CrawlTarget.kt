@@ -6,7 +6,9 @@ import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import java.util.UUID
 
-class CrawlTarget(id: EntityID<UUID>) : UUIDEntity(id) {
+class CrawlTarget(
+    id: EntityID<UUID>,
+) : UUIDEntity(id) {
     var url by CrawlTargets.url
     var adBannerWaitTimeInMillis by CrawlTargets.adBannerWaitTimeInMillis
     var adBannerButtonSelector by CrawlTargets.adBannerButtonSelector
