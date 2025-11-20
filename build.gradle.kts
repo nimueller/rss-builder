@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        // Liquibase itself plugin must be in the buildscript classpath for some strange reason
+        // https://github.com/liquibase/liquibase-gradle-plugin/blob/master/doc/usage.md#2-setting-up-the-classpath
+        classpath(libs.liquibase.core)
+    }
+}
+
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
@@ -39,6 +50,8 @@ dependencies {
     // Liquibase Gradle plugin runtime (for ./gradlew update)
     liquibaseRuntime(libs.liquibase.core)
     liquibaseRuntime(libs.postgresql)
+    liquibaseRuntime(libs.commons.lang)
+    liquibaseRuntime(libs.picocli)
 }
 
 tasks.test {
@@ -56,13 +69,12 @@ val jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
 
 liquibase {
     activities.register("main") {
-        this.arguments = mapOf(
+        arguments = mapOf(
             "logLevel" to "info",
             "changelogFile" to "src/main/resources/db/changelog/db.changelog-master.yaml",
             "url" to jdbcUrl,
             "username" to dbUser,
             "password" to dbPass,
-            "driver" to "org.postgresql.Driver",
         )
     }
     runList = "main"

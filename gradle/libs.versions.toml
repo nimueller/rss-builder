@@ -6,7 +6,9 @@ exposed = "0.44.+"
 postgres = "42.+"
 selenium3 = "3.+"
 liquibaseCore = "4.+"
-liquibasePlugin = "2.+"
+liquibasePlugin = "3.+"
+commonsLang3 = "3.+"
+picocli = "4.+"
 
 [libraries]
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
@@ -20,6 +22,8 @@ exposed-kotlin-datetime = { group = "org.jetbrains.exposed", name = "exposed-kot
 selenium-java = { group = "org.seleniumhq.selenium", name = "selenium-java", version.ref = "selenium3" }
 selenium-firefox-driver = { group = "org.seleniumhq.selenium", name = "selenium-firefox-driver", version.ref = "selenium3" }
 liquibase-core = { group = "org.liquibase", name = "liquibase-core", version.ref = "liquibaseCore" }
+commons-lang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLang3" }
+picocli = { group = "info.picocli", name = "picocli", version.ref = "picocli" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

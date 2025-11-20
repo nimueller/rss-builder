@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 001-create-crawl-targets
-      author: junie
+      author: nimueller
       changes:
         - createTable:
             tableName: crawl_targets
@@ -45,7 +45,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 002-create-crawl-results
-      author: junie
+      author: nimueller
       changes:
         - createTable:
             tableName: crawl_results

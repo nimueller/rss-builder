@@ -19,15 +19,6 @@ fun main() {
 
         val jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
 
-        // Run Liquibase migrations before using the database via Exposed
-        val liquibaseDb =
-            DatabaseFactory.getInstance().openDatabase(jdbcUrl, dbUser, dbPass, "org.postgresql.Driver", null)
-        Liquibase(
-            "db/changelog/db.changelog-master.yaml",
-            ClassLoaderResourceAccessor(),
-            liquibaseDb,
-        ).update("")
-
         // Now connect Exposed
         Database.connect(jdbcUrl, driver = "org.postgresql.Driver", user = dbUser, password = dbPass)
 
