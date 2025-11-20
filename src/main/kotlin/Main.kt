@@ -3,9 +3,6 @@ import dev.cryptospace.rss.Crawler.open
 import dev.cryptospace.rss.entity.CrawlTarget
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import liquibase.Liquibase
-import liquibase.database.DatabaseFactory
-import liquibase.resource.ClassLoaderResourceAccessor
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
