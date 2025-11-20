@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.sonarlint)
+    alias(libs.plugins.liquibase)
 }
 
 group = "dev.cryptospace"
@@ -31,8 +32,43 @@ dependencies {
 
     implementation(libs.selenium.java)
     implementation(libs.selenium.firefox.driver)
+
+    // Database migrations (runtime inside app)
+    implementation(libs.liquibase.core)
+
+    // Liquibase Gradle plugin runtime (for ./gradlew update)
+    liquibaseRuntime(libs.liquibase.core)
+    liquibaseRuntime(libs.postgresql)
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+// Configure Liquibase Gradle plugin to use env vars or sensible defaults
+val dbHost = System.getenv("DB_HOST") ?: "localhost"
+val dbPort = (System.getenv("DB_PORT") ?: "5432").toInt()
+val dbName = System.getenv("POSTGRES_DB") ?: System.getenv("DB_NAME") ?: "rss-builder"
+val dbUser = System.getenv("POSTGRES_USER") ?: System.getenv("DB_USER") ?: "postgres"
+val dbPass = System.getenv("POSTGRES_PASSWORD") ?: System.getenv("DB_PASSWORD") ?: "postgres"
+
+val jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
+
+liquibase {
+    activities.register("main") {
+        this.arguments = mapOf(
+            "logLevel" to "info",
+            "changelogFile" to "src/main/resources/db/changelog/db.changelog-master.yaml",
+            "url" to jdbcUrl,
+            "username" to dbUser,
+            "password" to dbPass,
+            "driver" to "org.postgresql.Driver",
+        )
+    }
+    runList = "main"
+}
+
+// Ensure DB is migrated before launching the app with `./gradlew run`
+tasks.named("run") {
+    dependsOn("update")
 }

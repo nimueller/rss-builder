@@ -5,6 +5,8 @@ sonarlint = "1.0.+"
 exposed = "0.44.+"
 postgres = "42.+"
 selenium3 = "3.+"
+liquibaseCore = "4.+"
+liquibasePlugin = "2.+"
 
 [libraries]
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
@@ -17,8 +19,10 @@ exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version
 exposed-kotlin-datetime = { group = "org.jetbrains.exposed", name = "exposed-kotlin-datetime", version.ref = "exposed" }
 selenium-java = { group = "org.seleniumhq.selenium", name = "selenium-java", version.ref = "selenium3" }
 selenium-firefox-driver = { group = "org.seleniumhq.selenium", name = "selenium-firefox-driver", version.ref = "selenium3" }
+liquibase-core = { group = "org.liquibase", name = "liquibase-core", version.ref = "liquibaseCore" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 sonarlint = { id = "se.solrike.sonarlint", version.ref = "sonarlint" }
+liquibase = { id = "org.liquibase.gradle", version.ref = "liquibasePlugin" }

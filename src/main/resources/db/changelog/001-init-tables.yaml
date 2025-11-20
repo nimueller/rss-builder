@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-crawl-targets
+      author: junie
+      changes:
+        - createTable:
+            tableName: crawl_targets
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: url
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ad_banner_wait_time_in_millis
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: ad_banner_button_selector
+                  type: TEXT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: item_selector
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_title_xpath
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_link_xpath
+                  type: TEXT
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-create-crawl-results
+      author: junie
+      changes:
+        - createTable:
+            tableName: crawl_results
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: target_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: body
+                  type: BYTEA
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: crawl_results
+            baseColumnNames: target_id
+            referencedTableName: crawl_targets
+            referencedColumnNames: id
+            constraintName: fk_crawl_results_target
+            onDelete: CASCADE
+        - createIndex:
+            tableName: crawl_results
+            indexName: idx_crawl_results_target_id
+            columns:
+              - column:
+                  name: target_id

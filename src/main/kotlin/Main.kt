@@ -1,12 +1,12 @@
 import dev.cryptospace.rss.Crawler.fetchItems
 import dev.cryptospace.rss.Crawler.open
 import dev.cryptospace.rss.entity.CrawlTarget
-import dev.cryptospace.rss.table.CrawlResults
-import dev.cryptospace.rss.table.CrawlTargets
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import liquibase.Liquibase
+import liquibase.database.DatabaseFactory
+import liquibase.resource.ClassLoaderResourceAccessor
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun main() {
@@ -18,11 +18,21 @@ fun main() {
         val dbPass = System.getenv("POSTGRES_PASSWORD") ?: System.getenv("DB_PASSWORD") ?: "postgres"
 
         val jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
+
+        // Run Liquibase migrations before using the database via Exposed
+        val liquibaseDb =
+            DatabaseFactory.getInstance().openDatabase(jdbcUrl, dbUser, dbPass, "org.postgresql.Driver", null)
+        Liquibase(
+            "db/changelog/db.changelog-master.yaml",
+            ClassLoaderResourceAccessor(),
+            liquibaseDb,
+        ).update("")
+
+        // Now connect Exposed
         Database.connect(jdbcUrl, driver = "org.postgresql.Driver", user = dbUser, password = dbPass)
 
+        // Seed initial data if empty
         transaction {
-            SchemaUtils.createMissingTablesAndColumns(CrawlTargets, CrawlResults)
-
             if (CrawlTarget.all().empty()) {
                 CrawlTarget.new {
                     url = "https://kicker.de"
