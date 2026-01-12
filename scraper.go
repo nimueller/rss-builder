@@ -1,7 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/gocolly/colly"
 )
@@ -13,24 +15,30 @@ type Item struct {
 	Content    string
 }
 
-type ScrapTarget struct {
-	URL                    string
-	baseGoquerySelector    string
-	itemGoquerySelector    string
-	imageGoquerySelector   string
-	articleGoquerySelector string
-}
-
 func main() {
-	target := ScrapTarget{
-		URL:                    "https://kicker.de",
-		baseGoquerySelector:    "#kick__ressort > section:nth-child(2)",
-		itemGoquerySelector:    ".kick__slidelist__item",
-		imageGoquerySelector:   ".kick__slidelist__item_content_picture img",
-		articleGoquerySelector: "main.kick__article__content",
+	db, err := NewDatabaseConnection()
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	queryItems(target)
+	defer func(db *sql.DB) {
+		err := db.Close()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
+	targets, err := GetScrapTargets(db)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, target := range targets {
+		queryItems(target)
+	}
 }
 
 func queryItems(target ScrapTarget) {
