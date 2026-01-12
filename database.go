@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"log"
 	"os"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -29,6 +30,12 @@ func NewDatabaseConnection() (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func CloseConnection(db *sql.DB) {
+	if err := db.Close(); err != nil {
+		log.Printf("Warning: failed to close DB: %v", err)
+	}
 }
 
 func GetScrapTargets(db *sql.DB) ([]ScrapTarget, error) {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -22,13 +21,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer func(db *sql.DB) {
-		err := db.Close()
-
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(db)
+	defer CloseConnection(db)
 
 	targets, err := GetScrapTargets(db)
 
