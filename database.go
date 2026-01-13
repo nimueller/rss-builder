@@ -17,6 +17,13 @@ type ScrapTarget struct {
 	articleGoquerySelector string
 }
 
+type ScrapResult struct {
+	Title      string
+	ArticleUrl string
+	ImageUrl   sql.NullString
+	Content    sql.NullString
+}
+
 func NewDatabaseConnection() (*sql.DB, error) {
 	url, urlSet := os.LookupEnv("DATABASE_URL")
 
@@ -106,4 +113,41 @@ func UpdateScrapContent(db *sql.DB, id int64, content string) error {
 	}
 
 	return nil
+}
+
+func GetLatestScrapResult(db *sql.DB, scrapTargetId int64) ([]ScrapResult, error) {
+	query := `SELECT title, article_url, image_url, content FROM scrap_result WHERE scrap_target_id = $1 ORDER BY id DESC`
+	rows, err := db.Query(query, scrapTargetId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+
+		if err != nil {
+			panic(err)
+		}
+	}(rows)
+
+	var scrapResults []ScrapResult
+
+	for rows.Next() {
+		var scrapResult ScrapResult
+		err := rows.Scan(
+			&scrapResult.Title,
+			&scrapResult.ArticleUrl,
+			&scrapResult.ImageUrl,
+			&scrapResult.Content,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		scrapResults = append(scrapResults, scrapResult)
+	}
+
+	return scrapResults, nil
 }
