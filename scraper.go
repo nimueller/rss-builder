@@ -1,14 +1,34 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gocolly/colly"
 )
 
-func main() {
+func RunScraperPeriodically(ctx context.Context, config Config) {
+	log.Println("Starting scraper...")
+	ticker := time.NewTicker(config.ScraperInterval)
+	defer ticker.Stop()
+	scrapeOnce()
+	log.Println("Scraping timer set. It will run every", config.ScraperInterval)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			scrapeOnce()
+		}
+	}
+}
+
+func scrapeOnce() {
+	log.Println("Scraping...")
 	db, err := NewDatabaseConnection()
 
 	if err != nil {
@@ -26,6 +46,7 @@ func main() {
 	for _, target := range targets {
 		queryItems(db, target)
 	}
+	log.Println("Scraping all targets finished.")
 }
 
 func queryItems(db *sql.DB, target ScrapTarget) {
@@ -68,7 +89,11 @@ func queryItems(db *sql.DB, target ScrapTarget) {
 		}
 	})
 
-	err := collector.Visit("https://kicker.de")
+	collector.OnRequest(func(r *colly.Request) {
+		log.Println("Visiting", r.URL)
+	})
+
+	err := collector.Visit(target.URL)
 
 	if err != nil {
 		panic(err)
