@@ -1,18 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/gocolly/colly"
 )
-
-type Item struct {
-	Title      string
-	ArticleURL string
-	ImageURL   string
-	Content    string
-}
 
 func main() {
 	db, err := NewDatabaseConnection()
@@ -30,43 +24,48 @@ func main() {
 	}
 
 	for _, target := range targets {
-		queryItems(target)
+		queryItems(db, target)
 	}
 }
 
-func queryItems(target ScrapTarget) {
+func queryItems(db *sql.DB, target ScrapTarget) {
 	collector := colly.NewCollector()
 
 	collector.OnHTML(target.baseGoquerySelector, func(e *colly.HTMLElement) {
 		e.ForEach(target.itemGoquerySelector, func(_ int, itemElement *colly.HTMLElement) {
-			item := &Item{
-				Title:      itemElement.ChildText("a[title]"),
-				ArticleURL: itemElement.ChildAttr("a[title]", "href"),
-				ImageURL:   itemElement.ChildAttr(fmt.Sprintf("%s img", target.imageGoquerySelector), "src"),
-			}
+			title := itemElement.ChildText("a[title]")
+			articleUrl := itemElement.Request.AbsoluteURL(itemElement.ChildAttr("a[title]", "href"))
+			imageUrl := itemElement.ChildAttr(fmt.Sprintf("%s img", target.imageGoquerySelector), "src")
 
-			context := colly.NewContext()
-			context.Put("item", item)
-			itemElement.Request.Ctx.Put("item", item)
-
-			err := itemElement.Request.Visit(item.ArticleURL)
+			resultId, err := InsertScrapResult(db, target, title, articleUrl, imageUrl)
 
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
+			}
+
+			itemElement.Request.Ctx.Put("item", resultId)
+
+			err = itemElement.Request.Visit(articleUrl)
+
+			if err != nil {
+				log.Println(err)
 			}
 		})
 	})
 
 	collector.OnHTML(target.articleGoquerySelector, func(e *colly.HTMLElement) {
-		item := e.Request.Ctx.GetAny("item").(*Item)
+		resultId := e.Request.Ctx.GetAny("item").(int64)
 		articleHtml, err := e.DOM.Html()
 
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
-		item.Content = articleHtml
-		fmt.Println(item.Content)
+		err = UpdateScrapContent(db, resultId, articleHtml)
+
+		if err != nil {
+			log.Println(err)
+		}
 	})
 
 	err := collector.Visit("https://kicker.de")

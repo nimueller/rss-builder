@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS scrap_result;

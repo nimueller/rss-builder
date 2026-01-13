@@ -9,6 +9,7 @@ import (
 )
 
 type ScrapTarget struct {
+	ID                     int64
 	URL                    string
 	baseGoquerySelector    string
 	itemGoquerySelector    string
@@ -39,12 +40,14 @@ func CloseConnection(db *sql.DB) {
 }
 
 func GetScrapTargets(db *sql.DB) ([]ScrapTarget, error) {
-	rows, err := db.Query(`SELECT url,
-										base_goquery_selector,
-										item_goquery_selector,
-										image_goquery_selector,
-										article_goquery_selector
-								   FROM scrap_target`)
+	query := `SELECT id,
+				url, 
+				base_goquery_selector,
+				item_goquery_selector,
+				image_goquery_selector,
+				article_goquery_selector
+		   FROM scrap_target`
+	rows, err := db.Query(query)
 
 	if err != nil {
 		return nil, err
@@ -62,7 +65,14 @@ func GetScrapTargets(db *sql.DB) ([]ScrapTarget, error) {
 
 	for rows.Next() {
 		var scrapTarget ScrapTarget
-		err := rows.Scan(&scrapTarget.URL, &scrapTarget.baseGoquerySelector, &scrapTarget.itemGoquerySelector, &scrapTarget.imageGoquerySelector, &scrapTarget.articleGoquerySelector)
+		err := rows.Scan(
+			&scrapTarget.ID,
+			&scrapTarget.URL,
+			&scrapTarget.baseGoquerySelector,
+			&scrapTarget.itemGoquerySelector,
+			&scrapTarget.imageGoquerySelector,
+			&scrapTarget.articleGoquerySelector,
+		)
 
 		if err != nil {
 			return nil, err
@@ -72,4 +82,28 @@ func GetScrapTargets(db *sql.DB) ([]ScrapTarget, error) {
 	}
 
 	return scrapTargets, nil
+}
+
+func InsertScrapResult(db *sql.DB, scrapTarget ScrapTarget, title string, articleUrl string, imageUrl string) (int64, error) {
+	query := `INSERT INTO scrap_result (scrap_target_id, title, article_url, image_url) VALUES ($1, $2, $3, $4) RETURNING id`
+	var insertedRowId int64
+
+	err := db.QueryRow(query, scrapTarget.ID, title, articleUrl, imageUrl).Scan(&insertedRowId)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return insertedRowId, nil
+}
+
+func UpdateScrapContent(db *sql.DB, id int64, content string) error {
+	query := `UPDATE scrap_result SET content = $1 WHERE id = $2`
+	_, err := db.Exec(query, content, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
