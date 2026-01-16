@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/xml"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -35,7 +36,7 @@ func RunWebServer(ctx context.Context, config Config, db *sql.DB) {
 	log.Println("Starting webserver...")
 	mux := http.NewServeMux()
 	mux.HandleFunc("/rss", func(writer http.ResponseWriter, request *http.Request) {
-		handleRssRoute(writer, db)
+		handleRssRoute(writer, request, db)
 	})
 	srv := &http.Server{Addr: config.WebServerHost + ":" + strconv.Itoa(config.WebServerPort), Handler: mux}
 
@@ -57,13 +58,19 @@ func RunWebServer(ctx context.Context, config Config, db *sql.DB) {
 	}
 }
 
-func handleRssRoute(w http.ResponseWriter, db *sql.DB) {
-	w.Header().Set("Content-Type", "application/rss+xml")
-
-	result, err := GetLatestScrapResult(db, 1)
+func handleRssRoute(w http.ResponseWriter, request *http.Request, db *sql.DB) {
+	targetId, err := strconv.ParseInt(request.URL.Query().Get("targetId"), 10, 64)
 
 	if err != nil {
-		http.Error(w, "Fehler beim Lesen der Datenbank", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Expected targetId %v as integer 64", targetId), http.StatusBadRequest)
+		log.Println(err)
+		return
+	}
+
+	result, err := GetLatestScrapResult(db, targetId)
+
+	if err != nil {
+		http.Error(w, "Error while reading results", http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
@@ -103,6 +110,7 @@ func handleRssRoute(w http.ResponseWriter, db *sql.DB) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/rss+xml")
 	w.Write([]byte(xml.Header))
 	w.Write(xmlData)
 }
