@@ -7,19 +7,23 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/caarlos0/env/v11"
 )
 
 type Config struct {
-	WebServerHost   string
-	WebServerPort   int
-	ScraperInterval time.Duration
+	DatabaseUrl     string        `env:"DATABASE_URL" envDefault:"postgres://postgres:postgres@localhost:5432/postgres"`
+	WebServerHost   string        `env:"WEBSERVER_HOST" envDefault:"localhost"`
+	WebServerPort   int           `env:"WEBSERVER_PORT" envDefault:"8080"`
+	ScraperInterval time.Duration `env:"SCRAPER_INTERVAL" envDefault:"10m"`
 }
 
 func main() {
-	config := Config{
-		WebServerHost:   "localhost",
-		WebServerPort:   8080,
-		ScraperInterval: 10 * time.Minute,
+	config := Config{}
+	err := env.Parse(&config)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

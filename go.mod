@@ -3,12 +3,12 @@ module rss-builder
 go 1.25
 
 require (
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gocolly/colly v1.2.0
 	github.com/jackc/pgx/v5 v5.8.0
 )
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/PuerkitoBio/goquery v1.11.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antchfx/htmlquery v1.3.5 // indirect
