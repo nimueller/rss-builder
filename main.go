@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 	"os/signal"
@@ -19,6 +20,21 @@ type Config struct {
 }
 
 func main() {
+	config := parseConfig()
+	db := connectToDatabase(config)
+	defer CloseConnection(db)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	go RunScraperPeriodically(ctx, config, db)
+	go RunWebServer(ctx, config, db)
+
+	log.Println("Started. Press Ctrl+C to stop.")
+	waitForSignal()
+}
+
+func parseConfig() Config {
 	config := Config{}
 	err := env.Parse(&config)
 
@@ -26,14 +42,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	return config
+}
 
-	go RunScraperPeriodically(ctx, config)
-	go RunWebServer(ctx, config)
+func connectToDatabase(config Config) *sql.DB {
+	db, err := NewDatabaseConnection(config)
 
-	log.Println("Started. Press Ctrl+C to stop.")
-	waitForSignal()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }
 
 func waitForSignal() {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/xml"
 	"log"
 	"net/http"
@@ -30,10 +31,12 @@ type Channel struct {
 	Items       []Item `xml:"item"`
 }
 
-func RunWebServer(ctx context.Context, config Config) {
+func RunWebServer(ctx context.Context, config Config, db *sql.DB) {
 	log.Println("Starting webserver...")
 	mux := http.NewServeMux()
-	mux.HandleFunc("/rss", rssHandler)
+	mux.HandleFunc("/rss", func(writer http.ResponseWriter, request *http.Request) {
+		handleRssRoute(writer, db)
+	})
 	srv := &http.Server{Addr: config.WebServerHost + ":" + strconv.Itoa(config.WebServerPort), Handler: mux}
 
 	go func() {
@@ -54,19 +57,8 @@ func RunWebServer(ctx context.Context, config Config) {
 	}
 }
 
-func rssHandler(w http.ResponseWriter, r *http.Request) {
+func handleRssRoute(w http.ResponseWriter, db *sql.DB) {
 	w.Header().Set("Content-Type", "application/rss+xml")
-
-	// TODO: connection pooling
-	db, err := NewDatabaseConnection()
-
-	if err != nil {
-		http.Error(w, "Fehler beim Verbinden zur Datenbank", http.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-
-	defer CloseConnection(db)
 
 	result, err := GetLatestScrapResult(db, 1)
 

@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"log"
-	"os"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -24,14 +23,8 @@ type ScrapResult struct {
 	Content    sql.NullString
 }
 
-func NewDatabaseConnection() (*sql.DB, error) {
-	url, urlSet := os.LookupEnv("DATABASE_URL")
-
-	if urlSet == false {
-		url = "postgres://postgres:postgres@localhost:5432/postgres"
-	}
-
-	db, err := sql.Open("pgx", url)
+func NewDatabaseConnection(config Config) (*sql.DB, error) {
+	db, err := sql.Open("pgx", config.DatabaseUrl)
 
 	if err != nil {
 		return nil, err

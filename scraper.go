@@ -10,11 +10,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func RunScraperPeriodically(ctx context.Context, config Config) {
+func RunScraperPeriodically(ctx context.Context, config Config, db *sql.DB) {
 	log.Println("Starting scraper...")
 	ticker := time.NewTicker(config.ScraperInterval)
 	defer ticker.Stop()
-	scrapeOnce()
+	scrapeOnce(db)
 	log.Println("Scraping timer set. It will run every", config.ScraperInterval)
 
 	for {
@@ -22,21 +22,13 @@ func RunScraperPeriodically(ctx context.Context, config Config) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			scrapeOnce()
+			scrapeOnce(db)
 		}
 	}
 }
 
-func scrapeOnce() {
+func scrapeOnce(db *sql.DB) {
 	log.Println("Scraping...")
-	db, err := NewDatabaseConnection()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer CloseConnection(db)
-
 	targets, err := GetScrapTargets(db)
 
 	if err != nil {
