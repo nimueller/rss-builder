@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -23,17 +24,25 @@ type ScrapResult struct {
 	Content    sql.NullString
 }
 
-func NewDatabaseConnection(config Config) (*sql.DB, error) {
+func NewDatabaseConnectionPool(config Config) (*sql.DB, error) {
 	db, err := sql.Open("pgx", config.DatabaseUrl)
 
 	if err != nil {
 		return nil, err
 	}
 
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 
-func CloseConnection(db *sql.DB) {
+func CloseConnectionPool(db *sql.DB) {
 	if err := db.Close(); err != nil {
 		log.Printf("Warning: failed to close DB: %v", err)
 	}

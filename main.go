@@ -22,7 +22,7 @@ type Config struct {
 func main() {
 	config := parseConfig()
 	db := connectToDatabase(config)
-	defer CloseConnection(db)
+	defer CloseConnectionPool(db)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -46,7 +46,7 @@ func parseConfig() Config {
 }
 
 func connectToDatabase(config Config) *sql.DB {
-	db, err := NewDatabaseConnection(config)
+	db, err := NewDatabaseConnectionPool(config)
 
 	if err != nil {
 		log.Fatal(err)
