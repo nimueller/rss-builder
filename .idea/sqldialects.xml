@@ -2,6 +2,8 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/db/migrations/000001_create_scrap_target_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/db/migrations/000002_create_scrap_process_table.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/migrations/000003_create_scrap_result_table.up.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/test_data.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>

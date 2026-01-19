@@ -135,7 +135,7 @@ func UpdateScrapContent(db *sql.DB, id int64, content string) error {
 }
 
 func GetLatestScrapResult(db *sql.DB, scrapTargetId int64) ([]ScrapResult, error) {
-	query := `SELECT title, article_url, image_url, content FROM scrap_result WHERE scrap_target_id = $1 ORDER BY id DESC`
+	query := `SELECT title, article_url, image_url, content FROM latest_scrap_results WHERE scrap_target_id = $1`
 	rows, err := db.Query(query, scrapTargetId)
 
 	if err != nil {
