@@ -12,7 +12,8 @@ content—and it will automatically collect it and store it in a database.
 You can then generate an RSS feed from the latest collected content, giving you a way to track websites that do not
 provide an RSS feed natively.
 
-> [!WARNING] This project is still in a very early development phase. Features may be incomplete, unstable, or
+> [!WARNING]
+> This project is still in a very early development phase. Features may be incomplete, unstable, or
 > subject to change.
 > This is a personal project to learn Go, so don't expect anything stable.
 
