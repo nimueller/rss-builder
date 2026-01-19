@@ -93,11 +93,28 @@ func GetScrapTargets(db *sql.DB) ([]ScrapTarget, error) {
 	return scrapTargets, nil
 }
 
-func InsertScrapResult(db *sql.DB, scrapTarget ScrapTarget, title string, articleUrl string, imageUrl string) (int64, error) {
-	query := `INSERT INTO scrap_result (scrap_target_id, title, article_url, image_url) VALUES ($1, $2, $3, $4) RETURNING id`
+func InsertScrapProcess(db *sql.DB) (int64, error) {
+	query := `INSERT INTO scrap_process DEFAULT VALUES RETURNING id`
 	var insertedRowId int64
+	err := db.QueryRow(query).Scan(&insertedRowId)
 
-	err := db.QueryRow(query, scrapTarget.ID, title, articleUrl, imageUrl).Scan(&insertedRowId)
+	if err != nil {
+		return 0, err
+	}
+
+	return insertedRowId, nil
+}
+
+func FinishScrapProcess(db *sql.DB, processId int64) error {
+	query := `UPDATE scrap_process SET finished_at = now(), status = 'FINISHED' WHERE id = $1`
+	_, err := db.Exec(query, processId)
+	return err
+}
+
+func InsertScrapResult(db *sql.DB, processId int64, scrapTarget ScrapTarget, title string, articleUrl string, imageUrl string) (int64, error) {
+	query := `INSERT INTO scrap_result (scrap_process_id, scrap_target_id, title, article_url, image_url) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	var insertedRowId int64
+	err := db.QueryRow(query, processId, scrapTarget.ID, title, articleUrl, imageUrl).Scan(&insertedRowId)
 
 	if err != nil {
 		return 0, err

@@ -29,19 +29,29 @@ func RunScraperPeriodically(ctx context.Context, config Config, db *sql.DB) {
 
 func scrapeOnce(db *sql.DB) {
 	log.Println("Scraping...")
+	processId, err := InsertScrapProcess(db)
+
+	if err != nil {
+		log.Println(err)
+	}
+
 	targets, err := GetScrapTargets(db)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	for _, target := range targets {
-		queryItems(db, target)
+		queryItems(db, processId, target)
+	}
+
+	if err := FinishScrapProcess(db, processId); err != nil {
+		log.Println(err)
 	}
 	log.Println("Scraping all targets finished.")
 }
 
-func queryItems(db *sql.DB, target ScrapTarget) {
+func queryItems(db *sql.DB, processId int64, target ScrapTarget) {
 	collector := colly.NewCollector()
 
 	collector.OnHTML(target.baseGoquerySelector, func(e *colly.HTMLElement) {
@@ -50,7 +60,7 @@ func queryItems(db *sql.DB, target ScrapTarget) {
 			articleUrl := itemElement.Request.AbsoluteURL(itemElement.ChildAttr("a[title]", "href"))
 			imageUrl := itemElement.ChildAttr(fmt.Sprintf("%s img", target.imageGoquerySelector), "src")
 
-			resultId, err := InsertScrapResult(db, target, title, articleUrl, imageUrl)
+			resultId, err := InsertScrapResult(db, processId, target, title, articleUrl, imageUrl)
 
 			if err != nil {
 				log.Println(err)
