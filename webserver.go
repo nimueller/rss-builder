@@ -51,7 +51,7 @@ func RunWebServer(ctx context.Context, config Config, db *sql.DB) {
 	log.Println("Webserver started. Serving is listening on", config.WebServerHost, "port", config.WebServerPort)
 	<-ctx.Done()
 
-	err := srv.Shutdown(context.Background())
+	err := srv.Shutdown(ctx)
 
 	if err != nil {
 		log.Println(err)
