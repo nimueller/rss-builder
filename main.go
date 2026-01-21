@@ -14,7 +14,7 @@ import (
 
 type Config struct {
 	DatabaseUrl     string        `env:"DATABASE_URL" envDefault:"postgres://postgres:postgres@localhost:5432/postgres"`
-	WebServerHost   string        `env:"WEBSERVER_HOST" envDefault:"localhost"`
+	WebServerHost   string        `env:"WEBSERVER_HOST" envDefault:"127.0.0.1"`
 	WebServerPort   int           `env:"WEBSERVER_PORT" envDefault:"8080"`
 	ScraperInterval time.Duration `env:"SCRAPER_INTERVAL" envDefault:"10m"`
 }
